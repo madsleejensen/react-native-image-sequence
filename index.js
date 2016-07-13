@@ -15,7 +15,7 @@ class ImageSequence extends Component {
     }
 
     return (
-      <MLJImageSequence
+      <RCTImageSequence
         {...this.props}
         images={normalized} />
     );
@@ -33,7 +33,7 @@ ImageSequence.propTypes = {
   framesPerSecond: React.PropTypes.number
 };
 
-const ImageSequence = requireNativeComponent('RCTImageSequence', {
+const RCTImageSequence = requireNativeComponent('RCTImageSequence', {
   propTypes: {
     ...View.propTypes,
     images: React.PropTypes.arrayOf(React.PropTypes.shape({
