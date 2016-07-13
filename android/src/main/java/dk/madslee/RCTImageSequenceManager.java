@@ -1,0 +1,48 @@
+package dk.madslee;
+
+import com.facebook.react.bridge.ReadableArray;
+import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.uimanager.SimpleViewManager;
+import com.facebook.react.uimanager.ThemedReactContext;
+import com.facebook.react.uimanager.annotations.ReactProp;
+
+import java.util.ArrayList;
+
+
+public class ImageSequenceManager extends SimpleViewManager<ImageSequenceView> {
+    @Override
+    public String getName() {
+        return "RCTImageSequencePackage";
+    }
+
+    @Override
+    protected ImageSequenceView createViewInstance(ThemedReactContext reactContext) {
+        return new ImageSequenceView(reactContext);
+    }
+
+    /**
+     * sets the speed of the animation.
+     *
+     * @param view
+     * @param framesPerSecond
+     */
+    @ReactProp(name = "framesPerSecond")
+    public void setFramesPerSecond(final ImageSequenceView view, Integer framesPerSecond) {
+        view.setFramesPerSecond(framesPerSecond);
+    }
+
+    /**
+     * @param view
+     * @param images an array of ReadableMap's {uri: "http://...."} return value of the resolveAssetSource(....)
+     */
+    @ReactProp(name = "images")
+    public void setImages(final ImageSequenceView view, ReadableArray images) {
+        ArrayList<String> uris = new ArrayList<>();
+        for (int index = 0; index < images.size(); index++) {
+            ReadableMap map = images.getMap(index);
+            uris.add(map.getString("uri"));
+        }
+
+        view.setImages(uris);
+    }
+}

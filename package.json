@@ -1,0 +1,20 @@
+{
+  "name": "react-native-image-sequence",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/madsleejensen/react-native-image-sequence.git"
+  },
+  "version": "0.1.0",
+  "description": "A <ImageSequence> component for react-native",
+  "author": {
+    "name": "Mads Lee Jensen",
+    "email": "madsleejensen@gmail.com",
+    "url": "http://mads-lee.dk"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/madsleejensen/react-native-image-sequence",
+  "keywords": [
+    "react-native",
+    "native"
+  ]
+}
