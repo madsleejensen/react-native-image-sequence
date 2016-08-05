@@ -14,6 +14,11 @@ import java.util.List;
 public class RCTImageSequencePackage implements ReactPackage {
 
     @Override
+    public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+        return Collections.emptyList();
+    }
+
+    @Override
     public List<Class<? extends JavaScriptModule>> createJSModules() {
         return Collections.emptyList();
     }

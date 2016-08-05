@@ -4,7 +4,7 @@
     "type" : "git",
     "url" : "https://github.com/madsleejensen/react-native-image-sequence.git"
   },
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A <ImageSequence> component for react-native",
   "author": {
     "name": "Mads Lee Jensen",
