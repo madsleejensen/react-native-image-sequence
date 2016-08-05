@@ -9,15 +9,15 @@ import com.facebook.react.uimanager.annotations.ReactProp;
 import java.util.ArrayList;
 
 
-public class ImageSequenceManager extends SimpleViewManager<ImageSequenceView> {
+public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceView> {
     @Override
     public String getName() {
         return "RCTImageSequencePackage";
     }
 
     @Override
-    protected ImageSequenceView createViewInstance(ThemedReactContext reactContext) {
-        return new ImageSequenceView(reactContext);
+    protected RCTImageSequenceView createViewInstance(ThemedReactContext reactContext) {
+        return new RCTImageSequenceView(reactContext);
     }
 
     /**
@@ -27,7 +27,7 @@ public class ImageSequenceManager extends SimpleViewManager<ImageSequenceView> {
      * @param framesPerSecond
      */
     @ReactProp(name = "framesPerSecond")
-    public void setFramesPerSecond(final ImageSequenceView view, Integer framesPerSecond) {
+    public void setFramesPerSecond(final RCTImageSequenceView view, Integer framesPerSecond) {
         view.setFramesPerSecond(framesPerSecond);
     }
 
@@ -36,7 +36,7 @@ public class ImageSequenceManager extends SimpleViewManager<ImageSequenceView> {
      * @param images an array of ReadableMap's {uri: "http://...."} return value of the resolveAssetSource(....)
      */
     @ReactProp(name = "images")
-    public void setImages(final ImageSequenceView view, ReadableArray images) {
+    public void setImages(final RCTImageSequenceView view, ReadableArray images) {
         ArrayList<String> uris = new ArrayList<>();
         for (int index = 0; index < images.size(); index++) {
             ReadableMap map = images.getMap(index);
