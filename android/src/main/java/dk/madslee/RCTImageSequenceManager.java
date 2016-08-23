@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceView> {
     @Override
     public String getName() {
-        return "RCTImageSequencePackage";
+	return "RCTImageSequence";
     }
 
     @Override
