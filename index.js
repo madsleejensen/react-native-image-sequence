@@ -25,12 +25,16 @@ class ImageSequence extends Component {
 ImageSequence.defaultProps = {
   startFrameIndex: 0,
   framesPerSecond: 24,
+  start: true,
+  oneShot: false
 };
 
 ImageSequence.propTypes = {
   startFrameIndex: React.PropTypes.number,
   images: React.PropTypes.array.isRequired,
-  framesPerSecond: React.PropTypes.number
+  framesPerSecond: React.PropTypes.number,
+  start: React.PropTypes.bool,
+  oneShot: React.PropTypes.bool
 };
 
 const RCTImageSequence = requireNativeComponent('RCTImageSequence', {
@@ -39,7 +43,9 @@ const RCTImageSequence = requireNativeComponent('RCTImageSequence', {
     images: React.PropTypes.arrayOf(React.PropTypes.shape({
       uri: React.PropTypes.string.isRequired
     })).isRequired,
-    framesPerSecond: React.PropTypes.number
+    framesPerSecond: React.PropTypes.number,
+    start: React.PropTypes.bool,
+    oneShot: React.PropTypes.bool
   },
 });
 

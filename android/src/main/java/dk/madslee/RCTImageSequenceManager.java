@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceView> {
     @Override
     public String getName() {
-	return "RCTImageSequence";
+        return "RCTImageSequence";
     }
 
     @Override
@@ -44,5 +44,27 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
         }
 
         view.setImages(uris);
+    }
+
+    /**
+     * sets whether or not the animation starts automatically.
+     *
+     * @param view
+     * @param start
+     */
+    @ReactProp(name = "start")
+    public void setStart(final RCTImageSequenceView view, boolean start) {
+        view.setStart(start);
+    }
+
+    /**
+     * sets whether or not the animation plays endlessly or once
+     *
+     * @param view
+     * @param oneShot
+     */
+    @ReactProp(name = "oneShot")
+    public void setOneShot(final RCTImageSequenceView view, boolean oneShot) {
+        view.setOneShot(oneShot);
     }
 }

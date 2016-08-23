@@ -16,8 +16,11 @@ import java.util.HashMap;
 
 public class RCTImageSequenceView extends ImageView {
     private Integer framesPerSecond = 24;
+    private boolean start = true;
+    private boolean oneShot = false;
     private ArrayList<AsyncTask> activeTasks;
     private HashMap<Integer, Bitmap> bitmaps;
+    private AnimationDrawable animationDrawable;
 
     public RCTImageSequenceView(Context context) {
         super(context);
@@ -97,6 +100,31 @@ public class RCTImageSequenceView extends ImageView {
         }
     }
 
+    public void setStart(boolean start) {
+        this.start = start;
+
+        //Start again if already loaded.
+        if (start == true && isLoaded()) {
+            setupAnimationDrawable();
+        }
+    }
+
+    public void setOneShot(boolean oneShot) {
+        this.oneShot = oneShot;
+
+        //Start again if already loaded.
+        if (isLoaded() && null != this.animationDrawable) {
+            this.animationDrawable.setOneShot(oneShot);
+        }
+    }
+
+    public void start() {
+        if (null != this.animationDrawable) {
+            this.animationDrawable.setOneShot(this.oneShot);
+            this.animationDrawable.start();
+        }
+    }
+
     private boolean isLoaded() {
         return !isLoading() && bitmaps != null && !bitmaps.isEmpty();
     }
@@ -106,15 +134,16 @@ public class RCTImageSequenceView extends ImageView {
     }
 
     private void setupAnimationDrawable() {
-        AnimationDrawable animationDrawable = new AnimationDrawable();
+        this.animationDrawable = new AnimationDrawable();
         for (int index = 0; index < bitmaps.size(); index++) {
             BitmapDrawable drawable = new BitmapDrawable(this.getResources(), bitmaps.get(index));
-            animationDrawable.addFrame(drawable, 1000 / framesPerSecond);
+            this.animationDrawable.addFrame(drawable, 1000 / framesPerSecond);
         }
 
-        animationDrawable.setOneShot(false);
-        animationDrawable.start();
+        if (start == true) {
+            start();
+        }
 
-        this.setImageDrawable(animationDrawable);
+        this.setImageDrawable(this.animationDrawable);
     }
 }
