@@ -53,7 +53,7 @@ public class RCTImageSequenceView extends ImageView {
 
             try {
                 InputStream in;
-                if (this.uri.matches("^http")) {
+                if (this.uri.startsWith("http") == true) {
                   in = new URL(this.uri).openStream();
                   bitmap = BitmapFactory.decodeStream(in);
                 } else {
