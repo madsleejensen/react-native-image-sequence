@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
+import android.net.Uri;
 import android.widget.ImageView;
 import android.support.annotation.Nullable;
 
@@ -28,12 +29,13 @@ public class RCTImageSequenceView extends ImageView {
     private ArrayList<AsyncTask> activeTasks;
     private HashMap<Integer, Bitmap> bitmaps;
     private AnimationDrawable animationDrawable;
+    private Context context = null;
 
     private ThemedReactContext mThemedReactContext;
 
     public RCTImageSequenceView(ThemedReactContext themedReactContext) {
-	super(themedReactContext);
-	mThemedReactContext = themedReactContext;
+        super(themedReactContext);
+        mThemedReactContext = themedReactContext;
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
@@ -50,14 +52,19 @@ public class RCTImageSequenceView extends ImageView {
             Bitmap bitmap = null;
 
             try {
-                InputStream in = new URL(this.uri).openStream();
-                bitmap = BitmapFactory.decodeStream(in);
+                InputStream in;
+                if (this.uri.matches("^http")) {
+                  in = new URL(this.uri).openStream();
+                  bitmap = BitmapFactory.decodeStream(in);
+                } else {
+                  bitmap = BitmapFactory.decodeResource(mThemedReactContext.getResources(), mThemedReactContext.getResources().getIdentifier(this.uri , "drawable", mThemedReactContext.getPackageName()));
+                }
             } catch (IOException e) {
-		WritableMap eventParams = Arguments.createMap();
-		eventParams.putString("index", this.index.toString());
-		eventParams.putString("uri", this.uri);
-		eventParams.putString("message", e.getMessage());
-		sendEvent("onError", eventParams);
+                WritableMap eventParams = Arguments.createMap();
+                eventParams.putString("index", this.index.toString());
+                eventParams.putString("uri", this.uri);
+                eventParams.putString("message", e.getMessage());
+                sendEvent("onError", eventParams);
             }
 
             return bitmap;
@@ -81,7 +88,7 @@ public class RCTImageSequenceView extends ImageView {
         activeTasks.remove(downloadImageTask);
 
         if (activeTasks.isEmpty()) {
-	    sendEvent("onLoadComplete", null);
+            sendEvent("onLoadComplete", null);
             setupAnimationDrawable();
         }
     }
@@ -98,13 +105,14 @@ public class RCTImageSequenceView extends ImageView {
         bitmaps = new HashMap<>(uris.size());
 
         for (int index = 0; index < uris.size(); index++) {
-            DownloadImageTask task = new DownloadImageTask(index, uris.get(index));
+            String uri = uris.get(index);
+            DownloadImageTask task = new DownloadImageTask(index, uri);
             activeTasks.add(task);
 
-	    WritableMap eventParams = Arguments.createMap();
-	    eventParams.putString("index", Integer.toString(index));
-	    eventParams.putString("uri", uri);
-	    sendEvent("onLoadStart", eventParams);
+            WritableMap eventParams = Arguments.createMap();
+            eventParams.putString("index", Integer.toString(index));
+            eventParams.putString("uri", uri);
+            sendEvent("onLoadStart", eventParams);
 
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
@@ -167,6 +175,6 @@ public class RCTImageSequenceView extends ImageView {
     }
 
     private void sendEvent(String eventName, @Nullable WritableMap params) {
-	mThemedReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
+        mThemedReactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 }

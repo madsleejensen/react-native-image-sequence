@@ -40,7 +40,8 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
         ArrayList<String> uris = new ArrayList<>();
         for (int index = 0; index < images.size(); index++) {
             ReadableMap map = images.getMap(index);
-            uris.add(map.getString("uri"));
+            String uri = map.getString("uri");
+            uris.add(uri);
         }
 
         view.setImages(uris);
