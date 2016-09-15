@@ -40,9 +40,32 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
         ArrayList<String> uris = new ArrayList<>();
         for (int index = 0; index < images.size(); index++) {
             ReadableMap map = images.getMap(index);
-            uris.add(map.getString("uri"));
+            String uri = map.getString("uri");
+            uris.add(uri);
         }
 
         view.setImages(uris);
+    }
+
+    /**
+     * sets whether or not the animation starts automatically.
+     *
+     * @param view
+     * @param start
+     */
+    @ReactProp(name = "start")
+    public void setStart(final RCTImageSequenceView view, boolean start) {
+        view.setStart(start);
+    }
+
+    /**
+     * sets whether or not the animation plays endlessly or once
+     *
+     * @param view
+     * @param oneShot
+     */
+    @ReactProp(name = "oneShot")
+    public void setOneShot(final RCTImageSequenceView view, boolean oneShot) {
+        view.setOneShot(oneShot);
     }
 }
