@@ -18,27 +18,44 @@ public class RCTImageSequenceView extends ImageView {
     private Integer framesPerSecond = 24;
     private ArrayList<AsyncTask> activeTasks;
     private HashMap<Integer, Bitmap> bitmaps;
+    private RCTResourceDrawableIdHelper resourceDrawableIdHelper;
 
     public RCTImageSequenceView(Context context) {
         super(context);
 
+        resourceDrawableIdHelper = new RCTResourceDrawableIdHelper();
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
         private final Integer index;
         private final String uri;
+        private final Context context;
 
-        public DownloadImageTask(Integer index, String uri) {
+        public DownloadImageTask(Integer index, String uri, Context context) {
             this.index = index;
             this.uri = uri;
+            this.context = context;
         }
 
         @Override
         protected Bitmap doInBackground(String... params) {
+            if (this.uri.startsWith("http")) {
+                return this.loadBitmapByExternalURL(this.uri);
+            }
+
+            return this.loadBitmapByLocalResource(this.uri);
+        }
+
+
+        private Bitmap loadBitmapByLocalResource(String uri) {
+            return BitmapFactory.decodeResource(this.context.getResources(), resourceDrawableIdHelper.getResourceDrawableId(this.context, uri));
+        }
+
+        private Bitmap loadBitmapByExternalURL(String uri) {
             Bitmap bitmap = null;
 
             try {
-                InputStream in = new URL(this.uri).openStream();
+                InputStream in = new URL(uri).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -81,7 +98,7 @@ public class RCTImageSequenceView extends ImageView {
         bitmaps = new HashMap<>(uris.size());
 
         for (int index = 0; index < uris.size(); index++) {
-            DownloadImageTask task = new DownloadImageTask(index, uris.get(index));
+            DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
             activeTasks.add(task);
 
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
