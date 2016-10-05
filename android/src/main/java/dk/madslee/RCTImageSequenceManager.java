@@ -21,6 +21,17 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
     }
 
     /**
+     * sets the sample size of the image.
+     *
+     * @param view
+     * @param sampleSize
+     */
+    @ReactProp(name = "sampleSize")
+    public void setSampleSize(final RCTImageSequenceView view, Integer sampleSize) {
+        view.setSampleSize(sampleSize);
+    }
+
+    /**
      * sets the speed of the animation.
      *
      * @param view

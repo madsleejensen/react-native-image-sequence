@@ -26,6 +26,7 @@ public class RCTImageSequenceView extends ImageView {
     private Integer framesPerSecond = 24;
     private boolean start = true;
     private boolean oneShot = false;
+    private Integer sampleSize = 1;
     private ArrayList<AsyncTask> activeTasks;
     private HashMap<Integer, Bitmap> bitmaps;
     private AnimationDrawable animationDrawable;
@@ -54,10 +55,14 @@ public class RCTImageSequenceView extends ImageView {
             try {
                 InputStream in;
                 if (this.uri.startsWith("http") == true) {
-                  in = new URL(this.uri).openStream();
-                  bitmap = BitmapFactory.decodeStream(in);
+                    in = new URL(this.uri).openStream();
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = sampleSize;
+                    bitmap = BitmapFactory.decodeStream(in, null, options);
                 } else {
-                  bitmap = BitmapFactory.decodeResource(mThemedReactContext.getResources(), mThemedReactContext.getResources().getIdentifier(this.uri , "drawable", mThemedReactContext.getPackageName()));
+                    BitmapFactory.Options options = new BitmapFactory.Options();
+                    options.inSampleSize = sampleSize;
+                    bitmap = BitmapFactory.decodeResource(mThemedReactContext.getResources(), mThemedReactContext.getResources().getIdentifier(this.uri , "drawable", mThemedReactContext.getPackageName()), options);
                 }
             } catch (IOException e) {
                 WritableMap eventParams = Arguments.createMap();
@@ -115,6 +120,14 @@ public class RCTImageSequenceView extends ImageView {
             sendEvent("onLoadStart", eventParams);
 
             task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }
+    }
+
+    public void setSampleSize(Integer sampleSize) {
+        this.sampleSize = sampleSize;
+        // updating sample size
+        if (isLoaded()) {
+            setupAnimationDrawable();
         }
     }
 
