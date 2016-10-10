@@ -1,4 +1,4 @@
-package dk.madslee;
+package dk.madslee.imageSequence;
 
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
