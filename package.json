@@ -15,6 +15,12 @@
   "homepage": "https://github.com/madsleejensen/react-native-image-sequence",
   "keywords": [
     "react-native",
-    "native"
+    "native",
+    "sequence",
+    "imagesequence",
+    "frames",
+    "frame-animation",
+    "animation",
+    "animationImages"
   ]
 }
