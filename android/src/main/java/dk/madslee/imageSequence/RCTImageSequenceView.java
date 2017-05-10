@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
@@ -13,6 +14,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.RejectedExecutionException;
+
 
 public class RCTImageSequenceView extends ImageView {
     private Integer framesPerSecond = 24;
@@ -101,7 +104,12 @@ public class RCTImageSequenceView extends ImageView {
             DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
             activeTasks.add(task);
 
-            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            try {
+                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            } catch (RejectedExecutionException e){
+                Log.e("react-native-image-sequence", "DownloadImageTask failed" + e.getMessage());
+                break;
+            }
         }
     }
 
