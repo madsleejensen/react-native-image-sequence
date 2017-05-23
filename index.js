@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import {
   View,
-  requireNativeComponent
+  requireNativeComponent,
+  ViewPropTypes
 } from 'react-native';
 import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource';
 
@@ -35,7 +36,7 @@ ImageSequence.propTypes = {
 
 const RCTImageSequence = requireNativeComponent('RCTImageSequence', {
   propTypes: {
-    ...View.propTypes,
+    ...ViewPropTypes,
     images: React.PropTypes.arrayOf(React.PropTypes.shape({
       uri: React.PropTypes.string.isRequired
     })).isRequired,
