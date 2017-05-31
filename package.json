@@ -11,6 +11,9 @@
     "email": "madsleejensen@gmail.com",
     "url": "http://mads-lee.dk"
   },
+  "peerDependencies": {
+    "react-native": ">=0.44.1"
+  },
   "license": "MIT",
   "homepage": "https://github.com/madsleejensen/react-native-image-sequence",
   "keywords": [
