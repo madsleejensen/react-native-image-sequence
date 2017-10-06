@@ -12,7 +12,8 @@
     "url": "http://mads-lee.dk"
   },
   "peerDependencies": {
-    "react-native": ">=0.47.0"
+    "react-native": ">=0.47.0",
+    "prop-types": ">=15.5.0"
   },
   "license": "MIT",
   "homepage": "https://github.com/madsleejensen/react-native-image-sequence",
