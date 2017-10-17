@@ -138,8 +138,8 @@ public class RCTImageSequenceView extends ImageView {
         }
 
         animationDrawable.setOneShot(false);
-        animationDrawable.start();
 
         this.setImageDrawable(animationDrawable);
+        animationDrawable.start();
     }
 }
