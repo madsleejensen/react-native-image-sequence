@@ -45,4 +45,15 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
 
         view.setImages(uris);
     }
+
+    /**
+     * sets if animations is looped indefinitely.
+     *
+     * @param view
+     * @param loop
+     */
+    @ReactProp(name = "loop")
+    public void setLoop(final RCTImageSequenceView view, Boolean loop) {
+        view.setLoop(loop);
+    }
 }

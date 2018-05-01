@@ -39,3 +39,14 @@ You can change the speed of the animation by setting the `framesPerSecond` prope
   framesPerSecond={24}
   />
 ```
+
+### Looping
+You can change if animation loops indefinitely by setting the `loop` property.
+
+```javascript
+<ImageSequence
+  images={images}
+  framesPerSecond={24}
+  loop={false}
+  />
+```
