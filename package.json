@@ -1,10 +1,10 @@
 {
-  "name": "react-native-image-sequence",
+  "name": "react-native-image-sequence-podspec",
   "repository": {
     "type": "git",
-    "url": "https://github.com/madsleejensen/react-native-image-sequence.git"
+    "url": "https://github.com/lhl09120/react-native-image-sequence.git"
   },
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A <ImageSequence> component for react-native",
   "author": {
     "name": "Mads Lee Jensen",
@@ -16,7 +16,7 @@
     "prop-types": ">=15.5.0"
   },
   "license": "MIT",
-  "homepage": "https://github.com/madsleejensen/react-native-image-sequence",
+  "homepage": "https://github.com/lhl09120/react-native-image-sequence",
   "keywords": [
     "react-native",
     "native",
