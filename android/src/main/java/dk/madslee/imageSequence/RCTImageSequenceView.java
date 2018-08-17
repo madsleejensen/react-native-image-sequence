@@ -46,6 +46,9 @@ public class RCTImageSequenceView extends ImageView {
             if (this.uri.startsWith("http")) {
                 return this.loadBitmapByExternalURL(this.uri);
             }
+            if (this.uri.startsWith("file")) {
+                return this.loadBitmapByFileURL(this.uri.replace("file:", ""));
+            }
 
             return this.loadBitmapByLocalResource(this.uri);
         }
@@ -66,6 +69,10 @@ public class RCTImageSequenceView extends ImageView {
             }
 
             return bitmap;
+        }
+
+        private Bitmap loadBitmapByFileURL(String uri) {
+            return BitmapFactory.decodeFile(uri);
         }
 
         @Override
