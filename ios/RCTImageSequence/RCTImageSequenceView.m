@@ -10,6 +10,7 @@
     NSMutableDictionary *_activeTasks;
     NSMutableDictionary *_imagesLoaded;
     BOOL _loop;
+    BOOL _isAnimating;
 }
 
 - (void)setImages:(NSArray *)images {
@@ -82,6 +83,15 @@
     _loop = loop;
 
     self.animationRepeatCount = _loop ? 0 : 1;
+}
+
+- (void)setIsAnimating:(BOOL)isAnimating{
+    _isAnimating = isAnimating;
+    if (_isAnimating) {
+        [self startAnimating];
+    }else{
+        [self stopAnimating];
+    }
 }
 
 @end
