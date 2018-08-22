@@ -45,6 +45,9 @@ public class RCTImageSequenceView extends ImageView {
         protected Bitmap doInBackground(String... params) {
             if (this.uri.startsWith("http")) {
                 return this.loadBitmapByExternalURL(this.uri);
+            }else if (this.uri.startsWith("file://")) {
+                String url = this.uri.replaceAll("file://", "");
+                return BitmapFactory.decodeFile(url);
             }
 
             return this.loadBitmapByLocalResource(this.uri);
