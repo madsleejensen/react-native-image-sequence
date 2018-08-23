@@ -56,4 +56,11 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
     public void setLoop(final RCTImageSequenceView view, Boolean loop) {
         view.setLoop(loop);
     }
+
+
+    @ReactProp(name = "isAnimating")
+    public void setAnimating(final RCTImageSequenceView view, Boolean isAnima) {
+        view.setIsAnim(isAnima);
+    }
+
 }

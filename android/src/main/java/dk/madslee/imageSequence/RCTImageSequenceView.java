@@ -5,6 +5,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.support.annotation.Nullable;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.os.AsyncTask;
 import android.widget.ImageView;
@@ -20,13 +22,25 @@ import java.util.concurrent.RejectedExecutionException;
 public class RCTImageSequenceView extends ImageView {
     private Integer framesPerSecond = 24;
     private Boolean loop = true;
+    private Boolean isAnim = false;
+
     private ArrayList<AsyncTask> activeTasks;
     private HashMap<Integer, Bitmap> bitmaps;
     private RCTResourceDrawableIdHelper resourceDrawableIdHelper;
 
-    public RCTImageSequenceView(Context context) {
-        super(context);
+    AnimationDrawable animationDrawable;
 
+
+    public RCTImageSequenceView(Context context) {
+        this(context, null);
+    }
+
+    public RCTImageSequenceView(Context context, @Nullable AttributeSet attrs) {
+        this(context, attrs, 0);
+    }
+
+    public RCTImageSequenceView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
         resourceDrawableIdHelper = new RCTResourceDrawableIdHelper();
     }
 
@@ -107,7 +121,7 @@ public class RCTImageSequenceView extends ImageView {
 
             try {
                 task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } catch (RejectedExecutionException e){
+            } catch (RejectedExecutionException e) {
                 Log.e("react-native-image-sequence", "DownloadImageTask failed" + e.getMessage());
                 break;
             }
@@ -132,6 +146,17 @@ public class RCTImageSequenceView extends ImageView {
         }
     }
 
+    public void setIsAnim(Boolean isAnim) {
+        this.isAnim = isAnim;
+        if (isLoaded()) {
+            setupAnimationDrawable();
+        }
+    }
+
+    public Boolean getAnim() {
+        return isAnim;
+    }
+
     private boolean isLoaded() {
         return !isLoading() && bitmaps != null && !bitmaps.isEmpty();
     }
@@ -141,7 +166,7 @@ public class RCTImageSequenceView extends ImageView {
     }
 
     private void setupAnimationDrawable() {
-        AnimationDrawable animationDrawable = new AnimationDrawable();
+        animationDrawable = new AnimationDrawable();
         for (int index = 0; index < bitmaps.size(); index++) {
             BitmapDrawable drawable = new BitmapDrawable(this.getResources(), bitmaps.get(index));
             animationDrawable.addFrame(drawable, 1000 / framesPerSecond);
@@ -150,6 +175,11 @@ public class RCTImageSequenceView extends ImageView {
         animationDrawable.setOneShot(!this.loop);
 
         this.setImageDrawable(animationDrawable);
-        animationDrawable.start();
+
+        if (isAnim) {
+            animationDrawable.start();
+        } else {
+            animationDrawable.stop();
+        }
     }
 }
