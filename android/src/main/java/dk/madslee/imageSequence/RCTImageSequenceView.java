@@ -11,11 +11,14 @@ import android.util.Log;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.RejectedExecutionException;
 
 
@@ -30,6 +33,10 @@ public class RCTImageSequenceView extends ImageView {
 
     AnimationDrawable animationDrawable;
 
+    private int mWith;
+    private int mHeight;
+
+    private Context mContext;
 
     public RCTImageSequenceView(Context context) {
         this(context, null);
@@ -41,7 +48,13 @@ public class RCTImageSequenceView extends ImageView {
 
     public RCTImageSequenceView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+        this.mContext = context;
         resourceDrawableIdHelper = new RCTResourceDrawableIdHelper();
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
     private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
@@ -58,27 +71,49 @@ public class RCTImageSequenceView extends ImageView {
         @Override
         protected Bitmap doInBackground(String... params) {
             if (this.uri.startsWith("http")) {
-                return this.loadBitmapByExternalURL(this.uri);
+                try {
+                    return Glide.with(this.context).load(this.uri).asBitmap().into(mWith, mHeight).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+                return null;
             }
-
             return this.loadBitmapByLocalResource(this.uri);
         }
 
 
         private Bitmap loadBitmapByLocalResource(String uri) {
-            return BitmapFactory.decodeResource(this.context.getResources(), resourceDrawableIdHelper.getResourceDrawableId(this.context, uri));
-        }
-
-        private Bitmap loadBitmapByExternalURL(String uri) {
-            Bitmap bitmap = null;
-
             try {
-                InputStream in = new URL(uri).openStream();
-                bitmap = BitmapFactory.decodeStream(in);
-            } catch (IOException e) {
+                return Glide.with(this.context).load(resourceDrawableIdHelper.getResourceDrawableId(this.context, uri)).asBitmap().into(mWith, mHeight).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
                 e.printStackTrace();
             }
 
+            return null;
+        }
+
+
+        private Bitmap loadBitmapByExternalURL(String uri) {
+            Bitmap bitmap = null;
+            InputStream in = null;
+            try {
+                in = new URL(uri).openStream();
+                bitmap = BitmapFactory.decodeStream(in);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             return bitmap;
         }
 
@@ -104,7 +139,7 @@ public class RCTImageSequenceView extends ImageView {
         }
     }
 
-    public void setImages(ArrayList<String> uris) {
+    public void setImages(final ArrayList<String> uris) {
         if (isLoading()) {
             // cancel ongoing tasks (if still loading previous images)
             for (int index = 0; index < activeTasks.size(); index++) {
@@ -115,17 +150,26 @@ public class RCTImageSequenceView extends ImageView {
         activeTasks = new ArrayList<>(uris.size());
         bitmaps = new HashMap<>(uris.size());
 
-        for (int index = 0; index < uris.size(); index++) {
-            DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
-            activeTasks.add(task);
+        this.post(new Runnable() {
+            @Override
+            public void run() {
 
-            try {
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } catch (RejectedExecutionException e) {
-                Log.e("react-native-image-sequence", "DownloadImageTask failed" + e.getMessage());
-                break;
+                mWith = getWidth();
+                mHeight = getHeight();
+
+                for (int index = 0; index < uris.size(); index++) {
+                    DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
+                    activeTasks.add(task);
+                    try {
+                        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                    } catch (RejectedExecutionException e) {
+                        Log.e("image-sequence", "DownloadImageTask failed" + e.getMessage());
+                        break;
+                    }
+                }
             }
-        }
+        });
+
     }
 
     public void setFramesPerSecond(Integer framesPerSecond) {
