@@ -156,6 +156,13 @@ public class RCTImageSequenceView extends ImageView {
 
                 mWith = getWidth();
                 mHeight = getHeight();
+                
+                if (mWith==0){
+                    mWith=700;
+                }
+                if (mHeight==0){
+                    mHeight=700;
+                }
 
                 for (int index = 0; index < uris.size(); index++) {
                     DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
