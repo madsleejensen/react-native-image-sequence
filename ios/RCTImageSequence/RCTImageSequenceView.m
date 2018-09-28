@@ -14,28 +14,29 @@
 
 - (void)setImages:(NSArray *)images {
     __weak RCTImageSequenceView *weakSelf = self;
-
+    
     self.animationImages = nil;
-
+    
     _activeTasks = [NSMutableDictionary new];
     _imagesLoaded = [NSMutableDictionary new];
-
+    
     for (NSUInteger index = 0; index < images.count; index++) {
         NSDictionary *item = images[index];
-
-        #ifdef DEBUG
+        
         NSString *url = item[@"uri"];
-        #else
-        NSString *url = [NSString stringWithFormat:@"file://%@", item[@"uri"]]; // when not in debug, the paths are "local paths" (because resources are bundled in app)
-        #endif
-
+        
         dispatch_async(dispatch_queue_create("dk.mads-lee.ImageSequence.Downloader", NULL), ^{
-            UIImage *image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:url]]];
+            UIImage *image;
+            if (item[@"useXcassets"]) {
+                image = [UIImage imageNamed:url];
+            } else {
+                image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:url]]];
+            }
             dispatch_async(dispatch_get_main_queue(), ^{
-              [weakSelf onImageLoadTaskAtIndex:index image:image];
+                [weakSelf onImageLoadTaskAtIndex:index image:image];
             });
         });
-
+        
         _activeTasks[@(index)] = url;
     }
 }
