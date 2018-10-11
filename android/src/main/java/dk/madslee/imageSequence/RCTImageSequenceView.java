@@ -15,6 +15,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 
 public class RCTImageSequenceView extends ImageView {
@@ -101,12 +104,22 @@ public class RCTImageSequenceView extends ImageView {
         activeTasks = new ArrayList<>(uris.size());
         bitmaps = new HashMap<>(uris.size());
 
+        ThreadPoolExecutor defaultExecutor = (ThreadPoolExecutor) AsyncTask.THREAD_POOL_EXECUTOR;
+
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(
+                defaultExecutor.getCorePoolSize(),
+                defaultExecutor.getMaximumPoolSize(),
+                defaultExecutor.getKeepAliveTime(TimeUnit.MILLISECONDS),
+                TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>()
+        );
+
         for (int index = 0; index < uris.size(); index++) {
             DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
             activeTasks.add(task);
 
             try {
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                task.executeOnExecutor(executor);
             } catch (RejectedExecutionException e){
                 Log.e("react-native-image-sequence", "DownloadImageTask failed" + e.getMessage());
                 break;
