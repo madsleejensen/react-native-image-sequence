@@ -1,12 +1,16 @@
 package dk.madslee.imageSequence;
 
+import android.view.View;
+
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.bridge.ReadableMap;
+import com.facebook.react.common.MapBuilder;
 import com.facebook.react.uimanager.SimpleViewManager;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 
 public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceView> {
@@ -37,6 +41,8 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
      */
     @ReactProp(name = "images")
     public void setImages(final RCTImageSequenceView view, ReadableArray images) {
+        if (images.size() == 0) return;
+
         ArrayList<String> uris = new ArrayList<>();
         for (int index = 0; index < images.size(); index++) {
             ReadableMap map = images.getMap(index);
@@ -55,5 +61,14 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
     @ReactProp(name = "loop")
     public void setLoop(final RCTImageSequenceView view, Boolean loop) {
         view.setLoop(loop);
+    }
+
+    public Map getExportedCustomBubblingEventTypeConstants() {
+        return MapBuilder.builder()
+                .put("onAnimationStart",
+                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onAnimationStart")))
+                .put("onImageLoding",
+                        MapBuilder.of("phasedRegistrationNames", MapBuilder.of("bubbled", "onImageLoding")))
+                .build();
     }
 }

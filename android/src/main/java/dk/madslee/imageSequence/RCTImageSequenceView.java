@@ -5,51 +5,71 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 import android.os.AsyncTask;
-import android.widget.ImageView;
+import android.support.annotation.Nullable;
+import android.support.v7.widget.AppCompatImageView;
+import android.util.Log;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.Target;
+import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.ReactContext;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
+import com.facebook.react.uimanager.events.RCTEventEmitter;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.RejectedExecutionException;
 
-
-public class RCTImageSequenceView extends ImageView {
+public class RCTImageSequenceView extends AppCompatImageView {
     private Integer framesPerSecond = 24;
     private Boolean loop = true;
-    private ArrayList<AsyncTask> activeTasks;
+    private AsyncTask activeTask;
+    private ArrayList<String> uris;
     private HashMap<Integer, Bitmap> bitmaps;
     private RCTResourceDrawableIdHelper resourceDrawableIdHelper;
 
     public RCTImageSequenceView(Context context) {
         super(context);
-
         resourceDrawableIdHelper = new RCTResourceDrawableIdHelper();
+        this.setScaleType(ScaleType.CENTER_CROP);
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        private final Integer index;
-        private final String uri;
+    private class DownloadImageTask extends AsyncTask<String, Void, HashMap<Integer, Bitmap>> {
+        private final ArrayList<String> uris;
         private final Context context;
 
-        public DownloadImageTask(Integer index, String uri, Context context) {
-            this.index = index;
-            this.uri = uri;
+        public DownloadImageTask(ArrayList<String> uris, Context context) {
+            this.uris = uris;
             this.context = context;
         }
 
         @Override
-        protected Bitmap doInBackground(String... params) {
-            if (this.uri.startsWith("http")) {
-                return this.loadBitmapByExternalURL(this.uri);
+        protected HashMap<Integer, Bitmap> doInBackground(String... params) {
+            Log.i ("react-native-image-sequence", "doInBackground");
+
+            HashMap<Integer, Bitmap> bitmaps = new HashMap<>();
+            Bitmap bitmap = null;
+            String uri = "";
+            WritableMap eventParams = Arguments.createMap();
+            for (int index = 0; index < uris.size(); index++) {
+                Log.i ("react-native-image-sequence", "doInBackground:index=" + index);
+                eventParams = Arguments.createMap();
+                eventParams.putInt("index", index);
+                sendEvent("onImageLoding", eventParams);
+
+                uri = uris.get(index);
+                if (uri.startsWith("http")) {
+                    bitmap = this.loadBitmapByExternalURL(uri);
+                }else{
+                    bitmap = this.loadBitmapByLocalResource(uri);
+                }
+                bitmaps.put(index, bitmap);
             }
 
-            return this.loadBitmapByLocalResource(this.uri);
+            return bitmaps;
         }
-
 
         private Bitmap loadBitmapByLocalResource(String uri) {
             return BitmapFactory.decodeResource(this.context.getResources(), resourceDrawableIdHelper.getResourceDrawableId(this.context, uri));
@@ -57,61 +77,54 @@ public class RCTImageSequenceView extends ImageView {
 
         private Bitmap loadBitmapByExternalURL(String uri) {
             Bitmap bitmap = null;
-
             try {
-                InputStream in = new URL(uri).openStream();
-                bitmap = BitmapFactory.decodeStream(in);
-            } catch (IOException e) {
+                bitmap = Glide.with(getContext()).load(uri).asBitmap().into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
+            } catch (Exception e) {
+                Log.e("react-native-image-sequence", "loadBitmapByExternalURL failed" + e.getMessage());
                 e.printStackTrace();
             }
-
             return bitmap;
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
+        protected void onPostExecute(HashMap<Integer, Bitmap> bitmaps) {
+            Log.i ("react-native-image-sequence", "onPostExecute:bitmaps=" + bitmaps.size());
             if (!isCancelled()) {
-                onTaskCompleted(this, index, bitmap);
+                onTaskCompleted(this, bitmaps);
             }
         }
     }
 
-    private void onTaskCompleted(DownloadImageTask downloadImageTask, Integer index, Bitmap bitmap) {
-        if (index == 0) {
-            // first image should be displayed as soon as possible.
-            this.setImageBitmap(bitmap);
-        }
+    private void onTaskCompleted(DownloadImageTask downloadImageTask, HashMap<Integer, Bitmap> bitmaps) {
+        Log.i ("react-native-image-sequence", "onTaskCompleted");
 
-        bitmaps.put(index, bitmap);
-        activeTasks.remove(downloadImageTask);
+        terminateActiveTask();
 
-        if (activeTasks.isEmpty()) {
-            setupAnimationDrawable();
-        }
+        if (bitmaps == null || bitmaps.size() == 0)  return;
+
+        // first image should be displayed as soon as possible.
+        this.setImageBitmap(bitmaps.get(0));
+
+        this.bitmaps = bitmaps;
+        setupAnimationDrawable();
     }
 
     public void setImages(ArrayList<String> uris) {
+        Log.i ("react-native-image-sequence", "setImages:uris=" + uris.size());
+
         if (isLoading()) {
             // cancel ongoing tasks (if still loading previous images)
-            for (int index = 0; index < activeTasks.size(); index++) {
-                activeTasks.get(index).cancel(true);
-            }
+            terminateActiveTask();
         }
 
-        activeTasks = new ArrayList<>(uris.size());
-        bitmaps = new HashMap<>(uris.size());
-
-        for (int index = 0; index < uris.size(); index++) {
-            DownloadImageTask task = new DownloadImageTask(index, uris.get(index), getContext());
-            activeTasks.add(task);
-
-            try {
-                task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            } catch (RejectedExecutionException e){
-                Log.e("react-native-image-sequence", "DownloadImageTask failed" + e.getMessage());
-                break;
-            }
+        DownloadImageTask task = new DownloadImageTask(uris, getContext());
+        this.activeTask = task;
+        try {
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (RejectedExecutionException e){
+            Log.e("react-native-image-sequence", "DownloadImageTask failed:" + e.getMessage());
         }
+
     }
 
     public void setFramesPerSecond(Integer framesPerSecond) {
@@ -137,7 +150,14 @@ public class RCTImageSequenceView extends ImageView {
     }
 
     private boolean isLoading() {
-        return activeTasks != null && !activeTasks.isEmpty();
+        return activeTask != null;
+    }
+
+    private void terminateActiveTask(){
+        if(this.activeTask != null){
+            this.activeTask.cancel(true);
+            this.activeTask = null;
+        }
     }
 
     private void setupAnimationDrawable() {
@@ -151,5 +171,20 @@ public class RCTImageSequenceView extends ImageView {
 
         this.setImageDrawable(animationDrawable);
         animationDrawable.start();
+
+        sendEvent("onAnimationStart", null);
+    }
+
+    @Override
+    public void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (isLoading()) {
+            terminateActiveTask();
+        }
+    }
+
+    void sendEvent(String eventName, @Nullable WritableMap params) {
+        ReactContext reactContext = (ReactContext) getContext();
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(getId(), eventName, params);
     }
 }
