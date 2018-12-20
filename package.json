@@ -4,8 +4,8 @@
     "type": "git",
     "url": "https://github.com/lhl09120/react-native-image-sequence.git"
   },
-  "version": "0.9.0",
-  "description": "A <ImageSequence> component for react-native",
+  "version": "1.0.1",
+  "description": "A <ImageSequence> component for react-native, but this package is not update anymore, so I(lhl09120) fork the old package and fix some problems and add some features",
   "author": {
     "name": "Mads Lee Jensen",
     "email": "madsleejensen@gmail.com",

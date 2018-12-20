@@ -55,6 +55,12 @@
     }
 }
 
+- (void)animationDidFinish {
+    NSUInteger lastIndex = [self.animationImages count] - 1;
+    self.image = [self.animationImages objectAtIndex:lastIndex];
+    self.animationImages = nil;
+}
+
 - (void)onImagesLoaded {
     NSMutableArray *images = [NSMutableArray new];
     for (NSUInteger index = 0; index < _imagesLoaded.allValues.count; index++) {
@@ -68,6 +74,11 @@
     self.animationDuration = images.count * (1.0f / _framesPerSecond);
     self.animationImages = images;
     self.animationRepeatCount = _loop ? 0 : 1;
+    if (!_loop) {
+        [self performSelector:@selector(animationDidFinish)
+              withObject:nil
+              afterDelay:self.animationDuration];
+    }
     [self startAnimating];
 }
 
