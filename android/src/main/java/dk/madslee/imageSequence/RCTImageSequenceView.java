@@ -1,6 +1,7 @@
 package dk.madslee.imageSequence;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
@@ -49,15 +50,16 @@ public class RCTImageSequenceView extends ImageView {
             if (this.uri.startsWith("file")) {
                 return this.loadBitmapByFileURL(this.uri.replace("file:", ""));
             }
-
+            if (this.uri.startsWith("asset")) {
+                return this.loadBitmapByAssetUrl(this.uri.replace("asset:", ""));
+            }
             return this.loadBitmapByLocalResource(this.uri);
         }
-
-
+        // 读取drawable文件
         private Bitmap loadBitmapByLocalResource(String uri) {
             return BitmapFactory.decodeResource(this.context.getResources(), resourceDrawableIdHelper.getResourceDrawableId(this.context, uri));
         }
-
+        // 读取远程图片
         private Bitmap loadBitmapByExternalURL(String uri) {
             Bitmap bitmap = null;
 
@@ -70,11 +72,23 @@ public class RCTImageSequenceView extends ImageView {
 
             return bitmap;
         }
-
+        // 从文件系统读取图片
         private Bitmap loadBitmapByFileURL(String uri) {
             return BitmapFactory.decodeFile(uri);
         }
+        // 从assets目录读取图片
+        private Bitmap loadBitmapByAssetUrl(String uri) {
+            Bitmap bitmap = null;
+            AssetManager asm = this.context.getAssets();
+            try {
+                InputStream in = asm.open(uri);
+                bitmap = BitmapFactory.decodeStream(in);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
+            return bitmap;
+        }
         @Override
         protected void onPostExecute(Bitmap bitmap) {
             if (!isCancelled()) {
