@@ -8,6 +8,33 @@ its a simple wrapper around **iOS** `UIImageView.animationImages` and **Android*
 1. `npm i --save react-native-image-sequence`
 2. `react-native link react-native-image-sequence`
 
+## Features
+These features only added to package `react-native-image-sequence`
+```javascript
+// read image from Assets.xcassets (Only iOS)
+const images = [
+  {
+    uri: 'path',
+    // add this property
+    useXcassets: true,
+  },
+];
+// read image from bundle (Only iOS)
+const images = [
+  {
+    uri: 'path',
+    // add this property
+    bundleName: 'bundleName',
+  },
+];
+// read image from assets floder (Only Android)
+const images = [
+  {
+    // add assets:/ scheme
+    uri: 'asset:/{picPath}',
+  },
+];
+```
 
 ## Examples
 

@@ -29,6 +29,15 @@
             UIImage *image;
             if (item[@"useXcassets"]) {
                 image = [UIImage imageNamed:url];
+            } else if (item[@"bundleName"]) {
+                // 1. 找到特定bundle
+                NSString *bundlePath = [[NSBundle mainBundle] pathForResource:item[@"bundleName"] ofType:nil];
+                // 2. 载入bundle，即创建bundle对象
+                NSBundle *bundle = [NSBundle bundleWithPath:bundlePath];
+                // 3. 从bundle中获取资源路径
+                NSString *picPath = [bundle pathForResource:url ofType:nil];
+                // 4. 通过路径创建对象
+                image = [UIImage imageWithContentsOfFile:picPath];
             } else {
                 image = [UIImage imageWithData:[NSData dataWithContentsOfURL:[NSURL URLWithString:url]]];
             }
@@ -45,11 +54,11 @@
     if (index == 0) {
         self.image = image;
     }
-
+    
     [_activeTasks removeObjectForKey:@(index)];
-
+    
     _imagesLoaded[@(index)] = image;
-
+    
     if (_activeTasks.allValues.count == 0) {
         [self onImagesLoaded];
     }
@@ -67,24 +76,24 @@
         UIImage *image = _imagesLoaded[@(index)];
         [images addObject:image];
     }
-
+    
     [_imagesLoaded removeAllObjects];
-
+    
     self.image = nil;
     self.animationDuration = images.count * (1.0f / _framesPerSecond);
     self.animationImages = images;
     self.animationRepeatCount = _loop ? 0 : 1;
     if (!_loop) {
         [self performSelector:@selector(animationDidFinish)
-              withObject:nil
-              afterDelay:self.animationDuration];
+                   withObject:nil
+                   afterDelay:self.animationDuration];
     }
     [self startAnimating];
 }
 
 - (void)setFramesPerSecond:(NSUInteger)framesPerSecond {
     _framesPerSecond = framesPerSecond;
-
+    
     if (self.animationImages.count > 0) {
         self.animationDuration = self.animationImages.count * (1.0f / _framesPerSecond);
     }
@@ -92,7 +101,7 @@
 
 - (void)setLoop:(NSUInteger)loop {
     _loop = loop;
-
+    
     self.animationRepeatCount = _loop ? 0 : 1;
 }
 
