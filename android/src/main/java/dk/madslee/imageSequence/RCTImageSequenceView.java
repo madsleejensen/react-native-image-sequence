@@ -52,7 +52,7 @@ public class RCTImageSequenceView extends ImageView {
 
 
         private Bitmap loadBitmapByLocalResource(String uri) {
-            return BitmapFactory.decodeResource(this.context.getResources(), resourceDrawableIdHelper.getResourceDrawableId(this.context, uri));
+            return BitmapFactory.decodeFile(uri);
         }
 
         private Bitmap loadBitmapByExternalURL(String uri) {
