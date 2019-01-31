@@ -52,7 +52,9 @@ public class RCTImageSequenceView extends ImageView {
 
 
         private Bitmap loadBitmapByLocalResource(String uri) {
-            return BitmapFactory.decodeFile(uri);
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inSampleSize = 3;
+            return BitmapFactory.decodeFile(uri, options);
         }
 
         private Bitmap loadBitmapByExternalURL(String uri) {
