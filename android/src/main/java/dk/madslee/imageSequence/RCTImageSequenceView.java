@@ -169,7 +169,7 @@ public class RCTImageSequenceView extends ImageView {
                     activeTasks.add(task);
                     try {
                         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                    } catch (RejectedExecutionException e) {
+                    } catch (Exception e) {
                         Log.e("image-sequence", "DownloadImageTask failed" + e.getMessage());
                         break;
                     }
