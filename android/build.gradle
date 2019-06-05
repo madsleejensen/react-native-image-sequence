@@ -25,6 +25,9 @@ android {
     }
 }
 
+def supportLibVersion = getExtOrDefault('supportLibVersion', "28.0.0")
+
 dependencies {
+    implementation "com.android.support:support-compat:$supportLibVersion"
     compile 'com.facebook.react:react-native:+'
 }

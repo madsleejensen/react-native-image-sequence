@@ -3,11 +3,13 @@ package dk.madslee.imageSequence;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import com.facebook.common.util.UriUtil;
+import android.support.v4.content.ContextCompat;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nullable;
+
+import com.facebook.common.util.UriUtil;
 
 
 public class RCTResourceDrawableIdHelper {
@@ -36,7 +38,7 @@ public class RCTResourceDrawableIdHelper {
 
     public @Nullable Drawable getResourceDrawable(Context context, @Nullable String name) {
         int resId = getResourceDrawableId(context, name);
-        return resId > 0 ? context.getResources().getDrawable(resId) : null;
+        return resId > 0 ? ContextCompat.getDrawable(context, resId) : null;
     }
 
     public Uri getResourceDrawableUri(Context context, @Nullable String name) {
