@@ -17,6 +17,8 @@
   },
   "license": "MIT",
   "homepage": "https://github.com/madsleejensen/react-native-image-sequence",
+  "main": "index.js",
+  "types": "typings/index.d.ts",
   "keywords": [
     "react-native",
     "native",
