@@ -13,6 +13,8 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_VIEW_PROPERTY(images, NSArray);
 RCT_EXPORT_VIEW_PROPERTY(framesPerSecond, NSUInteger);
 RCT_EXPORT_VIEW_PROPERTY(loop, BOOL);
+RCT_EXPORT_VIEW_PROPERTY(downsampleWidth, NSInteger);
+RCT_EXPORT_VIEW_PROPERTY(downsampleHeight, NSInteger);
 
 - (UIView *)view {
     return [RCTImageSequenceView new];

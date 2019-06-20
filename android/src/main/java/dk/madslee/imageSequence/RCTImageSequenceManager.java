@@ -56,4 +56,26 @@ public class RCTImageSequenceManager extends SimpleViewManager<RCTImageSequenceV
     public void setLoop(final RCTImageSequenceView view, Boolean loop) {
         view.setLoop(loop);
     }
+
+    /**
+     * sets the width for optional downsampling.
+     *
+     * @param view
+     * @param downsampleWidth
+     */
+    @ReactProp(name = "downsampleWidth")
+    public void setDownsampleWidth(final RCTImageSequenceView view, Integer downsampleWidth) {
+        view.setDownsampleWidth(downsampleWidth);
+    }
+
+    /**
+     * sets the height for optional downsampling.
+     *
+     * @param view
+     * @param downsampleHeight
+     */
+    @ReactProp(name = "downsampleHeight")
+    public void setDownsampleHeight(final RCTImageSequenceView view, Integer downsampleHeight) {
+        view.setDownsampleHeight(downsampleHeight);
+    }
 }
