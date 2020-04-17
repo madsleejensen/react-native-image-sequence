@@ -1,6 +1,7 @@
 import { Component } from 'react';
+import { ViewProps } from 'react-native';
 
-interface ImageSequenceProps {
+interface ImageSequenceProps extends ViewProps {
     /** An array of source images. Each element of the array should be the result of a call to require(imagePath). */
     images: any[];
     /** Which index of the images array should the sequence start at. Default: 0 */

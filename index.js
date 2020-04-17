@@ -31,6 +31,7 @@ ImageSequence.defaultProps = {
 };
 
 ImageSequence.propTypes = {
+  ...ViewPropTypes,
   startFrameIndex: number,
   images: array.isRequired,
   framesPerSecond: number,
