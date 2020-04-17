@@ -5,12 +5,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,11 +46,19 @@ public class RCTImageSequenceView extends ImageView {
 
         @Override
         protected Bitmap doInBackground(String... params) {
-            if (this.uri.startsWith("http")) {
-                return this.loadBitmapByExternalURL(this.uri);
-            }
+            try {
+                if (this.uri.startsWith("http")) {
+                    return this.loadBitmapByExternalURL(this.uri);
+                } else if (this.uri.startsWith("file://")) {
+                    File file = new File(new URI(this.uri));
+                    return BitmapFactory.decodeFile(file.getAbsolutePath());
+                }
 
-            return this.loadBitmapByLocalResource(this.uri);
+                return this.loadBitmapByLocalResource(this.uri);
+            } catch (Exception e) {
+
+            }
+            return null;
         }
 
 
@@ -57,12 +68,20 @@ public class RCTImageSequenceView extends ImageView {
 
         private Bitmap loadBitmapByExternalURL(String uri) {
             Bitmap bitmap = null;
+            InputStream in = null;
 
             try {
-                InputStream in = new URL(uri).openStream();
+                in = new URL(uri).openStream();
                 bitmap = BitmapFactory.decodeStream(in);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    if (in != null) {
+                        in.close();
+                    }
+                } catch (Exception e) {
+                }
             }
 
             return bitmap;
@@ -70,7 +89,7 @@ public class RCTImageSequenceView extends ImageView {
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            if (!isCancelled()) {
+            if (!isCancelled() && bitmap != null) {
                 onTaskCompleted(this, index, bitmap);
             }
         }
@@ -91,6 +110,11 @@ public class RCTImageSequenceView extends ImageView {
     }
 
     public void setImages(ArrayList<String> uris) {
+        Drawable drawable = getDrawable();
+        if(drawable instanceof AnimationDrawable){
+            ((AnimationDrawable)drawable).stop();
+        }
+
         if (isLoading()) {
             // cancel ongoing tasks (if still loading previous images)
             for (int index = 0; index < activeTasks.size(); index++) {
@@ -108,7 +132,7 @@ public class RCTImageSequenceView extends ImageView {
             try {
                 task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             } catch (RejectedExecutionException e){
-                Log.e("react-native-image-sequence", "DownloadImageTask failed" + e.getMessage());
+                Log.e("image-sequence", "DownloadImageTask failed" + e.getMessage());
                 break;
             }
         }
