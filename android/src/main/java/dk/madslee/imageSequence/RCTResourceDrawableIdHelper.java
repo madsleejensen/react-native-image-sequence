@@ -3,7 +3,7 @@ package dk.madslee.imageSequence;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.content.ContextCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.HashMap;
 import java.util.Map;
