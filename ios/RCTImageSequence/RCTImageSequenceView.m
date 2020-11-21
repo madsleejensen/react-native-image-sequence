@@ -63,7 +63,7 @@
 
     [_imagesLoaded removeAllObjects];
 
-    self.image = nil;
+    self.image = images.count > 0 ? images[images.count - 1] : nil;
     self.animationDuration = images.count * (1.0f / _framesPerSecond);
     self.animationImages = images;
     self.animationRepeatCount = _loop ? 0 : 1;
